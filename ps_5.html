@@ -374,7 +374,7 @@ summary {
 <p>ML 1) Not all respondents were asked every question. 2652 respondents were asked the question about whether the USA should create a gun registry.</p>
 <p>ML 2) Of the respondents that got asked all four gun policy questions, 23.76 percent are gun owners. (For the purposes of this question, you can assume that the people who answered “not sure” are not gun owners). Round to 2 digits after the decimal point.</p>
 <p>ML 3) The average “agreement” score (from 1-4) on the statement_gun_rights variable is 2.05 for those respondents who live in households without guns, while the average “agreement” score in households with guns is 2.6. (Calculate the average dropping respondents who weren’t asked, didn’t know, or skipped either question, and round to two digits after the decimal point).</p>
-<p>ML 4) Another set of questions asks about religion. The first ranked category of religion for the age group of people 18-30 (don’t include 30) is “X” . The first-ranked religion category for people 30 and older is “X”. Hint: you’re going to need the “labels” that are imported from the dta using haven; we suggest using as_factor to assign the right labels to the religion variable.</p>
+<p>ML 4) Another set of questions asks about religion. The first ranked category of religion for the age group of people 18-30 (don’t include 30) is “<code>r</code>” . The first-ranked religion category for people 30 and older is “<code>r</code>”. Hint: you’re going to need the “labels” that are imported from the dta using haven; we suggest using as_factor to assign the right labels to the religion variable.</p>
 <p>ML 5) Lots of people say that the younger generation has the highest percent of “nones;” people who answer “nothing in particular”, when you ask them their religion. In the 18-30 age group, “nothing in particular” is ranked X, while in the 30 and above group, “nothing in particular” is ranked X.</p>
 <p>ML 6) Consider again the nones (all people who responded “nothing in particular”) when asked about their religion. In this group, the most popular position is to X (strongly disagree, disagree, agree, or strongly agree?) that it is more important for the government to control who owns guns than it is for the government to protect the right to own guns (use the variable “statement_gun_rights” and only include respondents who were asked both of these questions).</p>
 </div>
@@ -392,12 +392,17 @@ summary {
 </div>
 <div id="question-6-publish-your-plot" class="section level2">
 <h2>Question #6: Publish your Plot</h2>
+<p>[Rpubs link]</p>
 </div>
 <div id="question-7-reprex" class="section level2">
 <h2>Question #7: Reprex</h2>
+<p><a href="https://github.com/GOV-1005-Spring-2020/problem-set-5-beccaxi/issues/1" class="uri">https://github.com/GOV-1005-Spring-2020/problem-set-5-beccaxi/issues/1</a></p>
 </div>
 <div id="question-8-demonstrating-understanding-of-sampling" class="section level2">
 <h2>Question #8: Demonstrating Understanding of Sampling</h2>
+<p>The population N of the country is constant and, as a running presidential candidate with elections coming up fast, I would like to know the proportion of the population that (as of right now) would vote for me. A complete census or survey of the entire population is impossible given our budget, so I have to make do with a sample instead and come up with the most accurate sample proportion that I can.</p>
+<p>I have the choice to poll a sample of size n = 5000 from the five major cities (1000 from each city), or a sample of equal size n = 5000 from the ten states (500 in each state). I would like whichever sample I choose to be a representative sample (that is, one that roughly looks like the entire population) so that the polls will provide a more accurate depiction of my odds of winning the upcoming election. This is basically equivalent to wanting my sample proportion to be generalizable to the population.</p>
+<p>Assuming that each of the five major cities contains a decently significant proportion of the population of the state in which that city is located, I choose to sample 500 people from each of the ten states. By doing so, I ensure that I get a representative sample of the states in which none of the major cities are located. As for the states that do contain major cities: the assumption allows me to assume that the major cities themselves will be well represented in the samples of the states in which they are located, making perhaps for a “biased” sampling in which individuals that live in the five major cities have a higher chance of being included in the sampling of their state’s population than individuals in other cities and areas within that state. In essence, under the terms of the assumption, a sample of 500 individuals from each state will be generalizable to the entire population of the ten states while likely being skewed toward those who live in the five major cities, thereby fulfilling close to the same function as a sample of 1000 people from each of those five cities.</p>
 </div>
 
 

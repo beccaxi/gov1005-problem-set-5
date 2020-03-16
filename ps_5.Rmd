@@ -119,12 +119,25 @@ skipped either question, and round to two digits after the decimal point).
 
 ```{r ML4, echo=FALSE}
 
-#
+# First, I have to filter for the age group of people 18-30. 
 
+eighteenthirty <- survey %>% 
+  select(age, religion) %>% 
+  filter(age >= 18 & age < 30) 
+
+# Now, simply repeat for the age group of people 30 and older
+
+thirtyup <- survey %>% 
+  select(age, religion) %>% 
+  filter(age >= 30)
 
 ```
 
-ML 4) Another set of questions asks about religion. The first ranked category of religion for the age group of people 18-30 (don’t include 30) is “X” . The first-ranked religion category for people 30 and older is “X”. Hint: you’re going to need the “labels” that are imported from the dta using haven; we suggest using as_factor to assign the right labels to the religion variable.
+ML 4) Another set of questions asks about religion. The first ranked category of
+religion for the age group of people 18-30 (don’t include 30) is “`r `” . 
+The first-ranked religion category for people 30 and older is “`r `”. Hint: 
+you’re going to need the “labels” that are imported from the dta using haven; we 
+suggest using as_factor to assign the right labels to the religion variable.
 
 
 ```{r ML5, echo=FALSE}
@@ -152,7 +165,9 @@ ML 6) Consider again the nones (all people who responded “nothing in particula
 
 
 
+
 ## Question #3: Modeling a Study Population
+
 
 
 
@@ -160,22 +175,56 @@ ML 6) Consider again the nones (all people who responded “nothing in particula
 
 
 
+
 ## Question #5: Sampling and Sample Size
+
 
 
 
 ## Question #6: Publish your Plot
 
+[Rpubs link]
+
 
 
 ## Question #7: Reprex
+
+https://github.com/GOV-1005-Spring-2020/problem-set-5-beccaxi/issues/1
 
 
 
 ## Question #8: Demonstrating Understanding of Sampling
 
+The population N of the country is constant and, as a running presidential 
+candidate with elections coming up fast, I would like to know the proportion of 
+the population that (as of right now) would vote for me. A complete census or 
+survey of the entire population is impossible given our budget, so I have to 
+make do with a sample instead and come up with the most accurate sample 
+proportion that I can. 
 
+I have the choice to poll a sample of size n = 5000 from the five major cities 
+(1000 from each city), or a sample of equal size n = 5000 from the ten states 
+(500 in each state). I would like whichever sample I choose to be a 
+representative sample (that is, one that roughly looks like the entire 
+population) so that the polls will provide a more accurate depiction of my odds 
+of winning the upcoming election. This is basically equivalent to wanting my 
+sample proportion to be generalizable to the population. 
 
+Assuming that each of the five major cities contains a decently significant 
+proportion of the population of the state in which that city is located, I 
+choose to sample 500 people from each of the ten states. By doing so, I ensure 
+that I get a representative sample of the states in which none of the major 
+cities are located. As for the states that do contain major cities: the 
+assumption allows me to assume that the major cities themselves will be well 
+represented in the samples of the states in which they are located, making 
+perhaps for a "biased" sampling in which individuals that live in the five major 
+cities have a higher chance of being included in the sampling of their state's 
+population than individuals in other cities and areas within that state. In 
+essence, under the terms of the assumption, a sample of 500 individuals from 
+each state will be generalizable to the entire population of the ten states 
+while likely being skewed toward those who live in the five major cities, 
+thereby fulfilling close to the same function as a sample of 1000 people from 
+each of those five cities.
 
 
 
