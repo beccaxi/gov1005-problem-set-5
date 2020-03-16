@@ -1,0 +1,125 @@
+---
+title: "Problem Set 5"
+author: "Rebecca Xi"
+date: "3/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(haven)
+
+# Import data from Voter Study Group, survey wave beginning on 12/26/2019
+
+survey <- read_dta("raw-data/ns20191226/ns20191226.dta")
+```
+
+
+## Question #1: Mad Libs
+
+```{r ML1, echo=FALSE}
+
+# To simplify things, I first select the user responses to the gun_registry
+# question only. Per the codebook, a value of 888 indicates "Not Asked", so I
+# filter out all "Not Asked" responses of 888. count() then counts the number of
+# remaining rows for me, i.e. the number or respondents who were actually asked
+# the question.
+
+r1 <- survey %>% 
+  select(gun_registry) %>%
+  filter(gun_registry != 888) %>% 
+  count()
+```
+
+ML 1) Not all respondents were asked every question. `r r1` respondents were asked the question about whether the USA should create a gun registry.
+
+
+```{r ML2, echo=FALSE}
+
+# 
+
+
+```
+
+ML 2) Of the respondents that got asked all four gun policy questions, `r r2` percent are gun owners. (For the purposes of this question, you can assume that the people who answered “not sure” are not gun owners). Round to 2 digits after the decimal point.
+
+
+```{r ML3, echo=FALSE}
+
+#
+
+
+```
+
+ML 3) The average “agreement” score (from 1-4) on the statement_gun_rights variable is X for those respondents who live in households without guns, while the average “agreement” score in households with guns is X. (Calculate the average dropping respondents who weren’t asked, didn’t know, or skipped either question, and round to two digits after the decimal point).
+
+
+```{r ML4, echo=FALSE}
+
+#
+
+
+```
+
+ML 4) Another set of questions asks about religion. The first ranked category of religion for the age group of people 18-30 (don’t include 30) is “X” . The first-ranked religion category for people 30 and older is “X”. Hint: you’re going to need the “labels” that are imported from the dta using haven; we suggest using as_factor to assign the right labels to the religion variable.
+
+
+```{r ML5, echo=FALSE}
+
+#
+
+
+```
+
+ML 5) Lots of people say that the younger generation has the highest percent of “nones;” people who answer “nothing in particular”, when you ask them their religion. In the 18-30 age group, “nothing in particular” is ranked X, while in the 30 and above group, “nothing in particular” is ranked X.
+
+
+```{r ML6, echo=FALSE}
+
+#
+
+
+```
+
+ML 6) Consider again the nones (all people who responded “nothing in particular”) when asked about their religion. In this group, the most popular position is to X (strongly disagree, disagree, agree, or strongly agree?) that it is more important for the government to control who owns guns than it is for the government to protect the right to own guns (use the variable “statement_gun_rights” and only include respondents who were asked both of these questions).
+
+
+
+## Question #2: Simulations with List Columns
+
+
+
+## Question #3: Modeling a Study Population
+
+
+
+## Question #4: Sampling
+
+
+
+## Question #5: Sampling and Sample Size
+
+
+
+## Question #6: Publish your Plot
+
+
+
+## Question #7: Reprex
+
+
+
+## Question #8: Demonstrating Understanding of Sampling
+
+
+
+
+
+
+
+
+
+
+
