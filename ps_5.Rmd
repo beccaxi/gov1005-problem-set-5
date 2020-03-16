@@ -8,8 +8,9 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(tidyverse)
+library(dplyr)
 library(haven)
+library(tidyverse)
 
 # Import data from Voter Study Group, survey wave beginning on 12/26/2019
 
@@ -139,13 +140,14 @@ Mode <- function(x) {
 
 r4_1 <- labelled %>% 
   filter(age >= 18 & age < 30) %>%
-  summarise(religion = Mode(religion))
+  summarize(religion = Mode(religion))
   
-# Now, simply repeat for the age group of people 30 and older
+# Now, simply repeat for the age group of people 30 and older, using the same
+# Mode function
 
 r4_2 <- labelled %>% 
   filter(age >= 30) %>% 
-  summarise(religion = Mode(religion))
+  summarize(religion = Mode(religion))
 ```
 
 ML 4) Another set of questions asks about religion. The first ranked category of
@@ -157,27 +159,101 @@ suggest using as_factor to assign the right labels to the religion variable.
 
 ```{r ML5, echo=FALSE}
 
-#
+# This question entails coming up with the frequency table of a factor variable.
+# I observe from calling factor(labelled$religion) that there are 13 factor
+# levels in total. I isolate the 18-30 age group from the get go and
+# additionally filter out any NA values of the religion variable. Next, I create
+# the frequency table using the count() function from the plyr package and
+# arrange the resulting table in descending order. In order to eventually select
+# for the ranking of "nothing in particular" in each age group, I create a new
+# column that assigns a ranking number to each level, from 1 onward.
 
+eighteenthirty <- labelled %>% 
+  filter(
+    age >= 18 & age < 30,
+    !is.na(religion)
+  ) %>%
+  count(religion) %>% 
+  arrange(desc(n))
+eighteenthirty_ranked <- eighteenthirty %>% 
+  mutate(rank = 1:nrow(eighteenthirty))
 
+# Here I filter for the religion level in question ("Nothing in particular") and
+# select just the corresponding value from the rank column I created in the
+# previous code block
+
+r5_1 <- eighteenthirty_ranked %>% 
+  filter(religion == "Nothing in particular") %>% 
+  select(rank)
+
+# Here I repeat the above processes for the 30 and above group. The only thing
+# that changes, obviously, is the original filter on age.
+
+thirtyup <- labelled %>% 
+  filter(
+    age >= 30,
+    !is.na(religion)
+  ) %>% 
+  count(religion) %>% 
+  arrange(desc(n))
+thirtyup_ranked <- thirtyup %>% 
+  mutate(rank = 1:nrow(thirtyup))
+
+r5_2 <- thirtyup_ranked %>% 
+  filter(religion == "Nothing in particular") %>% 
+  select(rank)
 ```
 
-ML 5) Lots of people say that the younger generation has the highest percent of “nones;” people who answer “nothing in particular”, when you ask them their religion. In the 18-30 age group, “nothing in particular” is ranked X, while in the 30 and above group, “nothing in particular” is ranked X.
+ML 5) Lots of people say that the younger generation has the highest percent of 
+“nones;” people who answer “nothing in particular”, when you ask them their 
+religion. In the 18-30 age group, “nothing in particular” is ranked `r r5_1`, 
+while in the 30 and above group, “nothing in particular” is ranked `r r5_2`.
 
 
 ```{r ML6, echo=FALSE}
 
-#
+# Starting from scratch with survey, I assign labels to factor levels for
+# religion as before and filter for "Nothing in particular", the group of
+# interest. I then immediately filtered statements_gun_rights to eliminate those
+# respondents that were not asked, were unsure, or skipped the question. Next, I
+# create a frequency table for statements_gun_rights using count() as before and
+# arrange in descending order before selecting for the most frequently occurring
+# response at the top of the table.
 
-
+r6 <- survey %>%
+  as_factor(levels = "labels") %>% 
+  filter(
+    religion == "Nothing in particular",
+    statements_gun_rights != "Not Asked" &
+    statements_gun_rights != "Not sure" &
+    statements_gun_rights != "Respondent Skipped"
+  ) %>%
+  select(statements_gun_rights) %>%
+  group_by(statements_gun_rights) %>% 
+  count() %>%
+  arrange(desc(n)) %>% 
+  head(1) %>% 
+  select(statements_gun_rights)
 ```
 
-ML 6) Consider again the nones (all people who responded “nothing in particular”) when asked about their religion. In this group, the most popular position is to X (strongly disagree, disagree, agree, or strongly agree?) that it is more important for the government to control who owns guns than it is for the government to protect the right to own guns (use the variable “statement_gun_rights” and only include respondents who were asked both of these questions).
+ML 6) Consider again the nones (all people who responded “nothing in 
+particular”) when asked about their religion. In this group, the most popular 
+position is to `r r6` (strongly disagree, disagree, agree, or strongly agree?) 
+that it is more important for the government to control who owns guns than it is
+for the government to protect the right to own guns (use the variable “statement_gun_rights” and only include respondents who were asked both of these questions).
 
 
 
 ## Question #2: Simulations with List Columns
 
+```{r Simulations, echo=FALSE}
+
+#
+
+
+
+
+```
 
 
 
