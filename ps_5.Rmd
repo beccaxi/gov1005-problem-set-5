@@ -119,23 +119,38 @@ skipped either question, and round to two digits after the decimal point).
 
 ```{r ML4, echo=FALSE}
 
-# First, I have to filter for the age group of people 18-30. 
+# Here I use as_factor to assign the right labels to the different values of the
+# religion variable, based on the already existing "labels" viewable in the data
 
-eighteenthirty <- survey %>% 
+labelled <- survey %>% 
   select(age, religion) %>% 
-  filter(age >= 18 & age < 30) 
+  as_factor(levels = "labels")
 
+# Here I filter for the age group of people 18-30 and determine which religion
+# label has the highest count. I do this using a Mode function which takes in
+# factor data and returns the most frequently occurring level of that factor
+# (https://stackoverflow.com/questions/2547402/is-there-a-built-in-function-for-
+# finding-the-mode).
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+r4_1 <- labelled %>% 
+  filter(age >= 18 & age < 30) %>%
+  summarise(religion = Mode(religion))
+  
 # Now, simply repeat for the age group of people 30 and older
 
-thirtyup <- survey %>% 
-  select(age, religion) %>% 
-  filter(age >= 30)
-
+r4_2 <- labelled %>% 
+  filter(age >= 30) %>% 
+  summarise(religion = Mode(religion))
 ```
 
 ML 4) Another set of questions asks about religion. The first ranked category of
-religion for the age group of people 18-30 (don’t include 30) is “`r `” . 
-The first-ranked religion category for people 30 and older is “`r `”. Hint: 
+religion for the age group of people 18-30 (don’t include 30) is “`r r4_1`” . 
+The first-ranked religion category for people 30 and older is “`r r4_2`”. Hint: 
 you’re going to need the “labels” that are imported from the dta using haven; we 
 suggest using as_factor to assign the right labels to the religion variable.
 
