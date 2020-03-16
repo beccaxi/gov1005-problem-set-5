@@ -33,27 +33,88 @@ r1 <- survey %>%
   count()
 ```
 
-ML 1) Not all respondents were asked every question. `r r1` respondents were asked the question about whether the USA should create a gun registry.
+ML 1) Not all respondents were asked every question. `r r1` respondents were 
+asked the question about whether the USA should create a gun registry.
 
 
 ```{r ML2, echo=FALSE}
 
-# 
+# Per the codebook, the four policy questions are labeled as guns_bg (background
+# checks), gun_registry, ban_guns, and limit_magazines. Since gun_registry is
+# the only question that might not have been asked, I filter as before in Mad
+# Libs 1. I also select household_gun_owner to set up the next step.
 
+all_four <- survey %>% 
+  select(
+    guns_bg, 
+    gun_registry, 
+    ban_guns, 
+    limit_magazines, 
+    household_gun_owner
+  ) %>% 
+  filter(gun_registry != 888)
 
+# Per the codebook, a value of 1 in the the column labeled household_gun_owner
+# indicates that the respondent is personally a gun owner
+
+gun_owner_count <- all_four %>% 
+  filter(household_gun_owner == 1) %>% 
+  count()
+
+# After finding the total number of respondents who answered all four questions,
+# I divide one count by the other and multiply by 100 to get a percentage value
+
+all_four_count <- all_four %>% 
+  count()
+r2 <- (100 * gun_owner_count / all_four_count) %>% 
+  round(digits = 2)
 ```
 
-ML 2) Of the respondents that got asked all four gun policy questions, `r r2` percent are gun owners. (For the purposes of this question, you can assume that the people who answered “not sure” are not gun owners). Round to 2 digits after the decimal point.
+ML 2) Of the respondents that got asked all four gun policy questions, `r r2` 
+percent are gun owners. (For the purposes of this question, you can assume that 
+the people who answered “not sure” are not gun owners). Round to 2 digits after 
+the decimal point.
 
 
 ```{r ML3, echo=FALSE}
 
-#
+# Per the codebook, a value of 3 under household_gun_owner indicates that nobody
+# in the household owns a gun. I also want to disregard respondents who weren't
+# asked (888), weren't sure (999), or skipped the question (.). After filtering
+# for those respondents, I take the mean.
 
+r3_1 <- survey %>% 
+  select(household_gun_owner, statements_gun_rights) %>% 
+  filter(
+    household_gun_owner == 3,
+    statements_gun_rights != 888,
+    statements_gun_rights != 999,
+    statements_gun_rights != "."
+  ) %>% 
+  summarize(mean(statements_gun_rights)) %>% 
+  round(digits = 2)
 
+# For households with guns, I copy paste the previous code chunk but filter for
+# values of 1 (I personally own a gun) or 2 (someone in household owns a gun)
+# under household_gun_owner
+
+r3_2 <- survey %>% 
+  select(household_gun_owner, statements_gun_rights) %>% 
+  filter(
+    household_gun_owner == 1 | household_gun_owner == 2, 
+    statements_gun_rights != 888,
+    statements_gun_rights != 999,
+    statements_gun_rights != "."
+  ) %>% 
+  summarize(mean(statements_gun_rights)) %>% 
+  round(digits = 2)
 ```
 
-ML 3) The average “agreement” score (from 1-4) on the statement_gun_rights variable is X for those respondents who live in households without guns, while the average “agreement” score in households with guns is X. (Calculate the average dropping respondents who weren’t asked, didn’t know, or skipped either question, and round to two digits after the decimal point).
+ML 3) The average “agreement” score (from 1-4) on the statement_gun_rights 
+variable is `r r3_1` for those respondents who live in households without guns, 
+while the average “agreement” score in households with guns is `r r3_2`. 
+(Calculate the average dropping respondents who weren’t asked, didn’t know, or 
+skipped either question, and round to two digits after the decimal point).
 
 
 ```{r ML4, echo=FALSE}
