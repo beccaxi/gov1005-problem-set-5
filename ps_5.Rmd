@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(dplyr)
 library(haven)
+library(gt)
 library(tidyverse)
 
 # Import data from Voter Study Group, survey wave beginning on 12/26/2019
@@ -246,14 +247,120 @@ for the government to protect the right to own guns (use the variable “stateme
 
 ## Question #2: Simulations with List Columns
 
-```{r Simulations, echo=FALSE}
+```{r 2A, echo=FALSE}
 
-#
+# This function draws n cards from a deck consisting practically of just
+# diamonds, hearts, spades, and clubs (the four suits). The function samples
+# without replacement (replace = TRUE) and only works for numeric inputs.
+
+draw_cards <- function(n) {
+  stopifnot(is.numeric(n))
+  sample(c("diamonds", "hearts", "spades", "clubs"), size = n, replace = TRUE)
+}
+```
+
+#### 2A)
+
+See RMarkdown file.
 
 
+```{r 2B, echo=FALSE}
+
+# With identical format as in the "craps" class, I draw 2 cards 10 times and map
+# the results in a tibble with 10 rows and one list column
+
+tibble <- tibble(results = map(1:10, ~ draw_cards(2)))
+```
+
+#### 2B)
+
+See RMarkdown file.
+
+
+```{r 2C, echo=FALSE}
+
+# Here I edit the tibble using mutate() and map_lgl() in order to add two new
+# columns (1 for each card drawn). Each column entry contains either TRUE or
+# FALSE in accordance with the condition defined in ifelse(), i.e. whether the
+# card in question is red (a heart or diamond) or not. If TRUE, the card is red;
+# if FALSE, the card is black (or not red).
+
+tibble <- tibble %>%  
+  mutate(
+    red1 = map_lgl(
+      results, 
+      ~ ifelse(
+        .[[1]] == "hearts" |
+        .[[1]] == "diamonds",
+        TRUE, 
+        FALSE)
+    ),
+    red2 = map_lgl(
+      results, 
+      ~ ifelse(
+        .[[2]] == "hearts" |
+        .[[2]] == "diamonds",
+        TRUE, 
+        FALSE)
+    )
+  )
+```
+
+#### 2C)
+
+See RMarkdown file.
+
+
+#### 2D)
+
+```{r 2D, echo=FALSE}
+
+# Here I use mutate() and case_when() to add a new column that states whether
+# the outcome of each 2-card draw is “both red (two TRUEs), “both black” (two
+# FALSEs), or “mixed” (which has two cases, which are the two permutations of
+# one TRUE and one FALSE). I decide to call this new column "outcome",
+# appropriately.
+
+tibble <- tibble %>% 
+  mutate(outcome = case_when(
+    red1 == TRUE & red2 == TRUE ~ "Both red",
+    red1 == FALSE & red2 == FALSE ~ "Both black",
+    red1 == TRUE & red2 == FALSE ~ "mixed",
+    red1 == FALSE & red2 == TRUE ~ "mixed"
+    )
+  )
+
+# Here I create a gt table of the tibble. Using the gt package and with the pset
+# instructions as guide, I add a title, subtitle, and relabel the four columns
+# accordingly.
+
+table <- tibble %>% 
+  gt() %>% 
+  tab_header(
+      title = "Drawing Two Cards",
+      subtitle = "Card Colors"
+    ) %>%
+    cols_label(
+      results = "Draw",
+      red1 = "First card red?", 
+      red2 = "Second card red?",
+      outcome = "Color Outcome"
+    )
+table
+```
+
+
+```{r 2E, echo=FALSE}
+
+# 
 
 
 ```
+
+#### 2E)
+
+When I simulate drawing two cards 1000 times, __ percent of my cards have 
+"mixed" colors.
 
 
 
