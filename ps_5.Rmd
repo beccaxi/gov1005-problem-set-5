@@ -45,8 +45,10 @@ asked the question about whether the USA should create a gun registry.
 # Per the codebook, the four policy questions are labeled as guns_bg (background
 # checks), gun_registry, ban_guns, and limit_magazines. Since gun_registry is
 # the only question that might not have been asked, I filter as before in Mad
-# Libs 1, and filter out all potential responses with NA values in the four gun
-# policy questions. I also select household_gun_owner to set up the next step.
+# Libs 1. In addition, I filter out all potential responses with NA values in
+# the four gun policy questions (and find that this does make a small difference
+# in final percentage value, indicating the presence of NA values). I also
+# select household_gun_owner in order to set up the next step.
 
 all_four <- survey %>% 
   select(
@@ -72,7 +74,8 @@ gun_owner_count <- all_four %>%
   count()
 
 # After finding the total number of respondents who answered all four questions,
-# I divide one count by the other and multiply by 100 to get a percentage value
+# I divide one count by the other and multiply by 100 to get a percentage value.
+# I also round to two digit places, as instructed.
 
 all_four_count <- all_four %>% 
   count()
@@ -91,7 +94,7 @@ the decimal point.
 # Per the codebook, a value of 3 under household_gun_owner indicates that nobody
 # in the household owns a gun. I also want to disregard respondents who weren't
 # asked (888), weren't sure (999), or skipped the question (.). After filtering
-# for those respondents, I take the mean.
+# out those respondents, I take the mean and round.
 
 r3_1 <- survey %>% 
   select(household_gun_owner, statements_gun_rights) %>% 
@@ -129,8 +132,9 @@ skipped either question, and round to two digits after the decimal point).
 
 ```{r ML4, echo=FALSE}
 
-# Here I use as_factor to assign the right labels to the different values of the
-# religion variable, based on the already existing "labels" viewable in the data
+# Here I use as_factor() to assign the right labels to the different values of
+# the religion variable, based on the already existing "labels" viewable in the
+# data
 
 labelled <- survey %>% 
   select(age, religion) %>% 
@@ -151,7 +155,7 @@ r4_1 <- labelled %>%
   filter(age >= 18 & age < 30) %>%
   summarize(religion = Mode(religion))
   
-# Now, simply repeat for the age group of people 30 and older, using the same
+# Now, I simply repeat for the age group of people 30 and older, using the same
 # Mode function
 
 r4_2 <- labelled %>% 
@@ -188,8 +192,8 @@ eighteenthirty_ranked <- eighteenthirty %>%
   mutate(rank = 1:nrow(eighteenthirty))
 
 # Here I filter for the religion level in question ("Nothing in particular") and
-# select just the corresponding value from the rank column I created in the
-# previous code block
+# select just the desired corresponding value from the rank column I created in
+# the previous code block
 
 r5_1 <- eighteenthirty_ranked %>% 
   filter(religion == "Nothing in particular") %>% 
@@ -223,11 +227,12 @@ while in the 30 and above group, “nothing in particular” is ranked `r r5_2`.
 
 # Starting from scratch with survey, I assign labels to factor levels for
 # religion as before and filter for "Nothing in particular", the group of
-# interest. I then immediately filtered statements_gun_rights to eliminate those
+# interest. I then immediately filter statements_gun_rights to eliminate those
 # respondents that were not asked, were unsure, or skipped the question. Next, I
 # create a frequency table for statements_gun_rights using count() as before and
-# arrange in descending order before selecting for the most frequently occurring
-# response at the top of the table.
+# arrange in descending order. This allows me to easily select for the most
+# frequently occurring response, at the top of the table, using head() and
+# select().
 
 r6 <- survey %>%
   as_factor(levels = "labels") %>% 
@@ -249,7 +254,9 @@ ML 6) Consider again the nones (all people who responded “nothing in
 particular”) when asked about their religion. In this group, the most popular 
 position is to `r r6` (strongly disagree, disagree, agree, or strongly agree?) 
 that it is more important for the government to control who owns guns than it is
-for the government to protect the right to own guns (use the variable “statement_gun_rights” and only include respondents who were asked both of these questions).
+for the government to protect the right to own guns (use the variable 
+“statement_gun_rights” and only include respondents who were asked both of these
+questions).
 
 
 
@@ -274,8 +281,8 @@ See RMarkdown file.
 
 ```{r 2B, echo=FALSE}
 
-# With identical format as in the "craps" class, I draw 2 cards 10 times and map
-# the results in a tibble with 10 rows and one list column
+# With identical format as in the "craps" lecture, I draw 2 cards 10 times and
+# map the results in a tibble with 10 rows and one list column
 
 tibble <- tibble(results = map(1:10, ~ draw_cards(2)))
 ```
@@ -291,7 +298,7 @@ See RMarkdown file.
 # columns (1 for each card drawn). Each column entry contains either TRUE or
 # FALSE in accordance with the condition defined in ifelse(), i.e. whether the
 # card in question is red (a heart or diamond) or not. If TRUE, the card is red;
-# if FALSE, the card is black (or not red).
+# if FALSE, the card is black (not red).
 
 tibble <- tibble %>%  
   mutate(
@@ -398,8 +405,9 @@ onethousand <- tibble(results = map(1:1000, ~ draw_cards(2))) %>%
 # 100 to get a percentage value. Per Piazza help, I call ungroup() first before
 # using select(n) because otherwise the tibble would still be grouped by outcome
 # after I apply filter() and count(), and select(n) would not work. This gets
-# rid of the pesky warning I'd been getting that I've introduced NA's by
-# coercion, since now I'm able to select for only the integer value that I want.
+# rid of the pesky warning I'd been consistently getting that I've introduced
+# NA's by coercion, since now I'm able to select for only the integer value that
+# I want.
 
 mixed <- onethousand %>% 
   group_by(outcome) %>%
@@ -479,15 +487,12 @@ university_plot
 
 # Here I create a tibble by drawing 5000 samples of 25 students each from the
 # university population. I use set.seed(02139) to standardize the otherwise
-# randomly drawn distributions to match the solutions key. My new tibble
-# contains an indexing column, a column "freshmen_sum" that records the number
-# of freshmen drawn in each sample, and a column "perc_freshmen" that records
-# the freshmen drawn in each sample as a percentage of the whole sample. For
-# freshmen_sum, I count the number of rows where grade is "freshmen" by using
-# length(which()): the which() function returns a vector of the indices where
-# the condition is met, the length of which is the count I want. I also add a
-# column sample_id which assigns to each sample an integer value from 1 to 5000,
-# consecutively. CHANGE FIX THIS
+# randomly drawn distributions to match the solutions key. After calling
+# rep_sample_n() to draw the desired samples, I filter for freshmen and group by
+# "replicate" (indicator for each sample). I then call count() so as to
+# aggregate the number of freshmen in each sample - these sums are stored in the
+# column "n". Finally, I add a new column "perc_freshmen" which stores the
+# percentage of freshmen in each sample, using the values of n.
 
 set.seed(02139)
 freshmen_dist <- university %>%
@@ -500,11 +505,11 @@ freshmen_dist <- university %>%
 # Now I create a plot of the distribution of percent freshmen using
 # geom_histogram() with the proportion of freshmen on the x-axis and specific
 # count on the y-axis. After some trial and error and talking with others on
-# Zoom, I set an appropriate binwidth of 0.01 and add labels.
+# Zoom, I set an appropriate binwidth of 0.02 and add labels.
 
 plot_dist <- freshmen_dist %>%
   ggplot(aes(x = perc_freshmen)) + 
-    geom_histogram(binwidth = 0.01) +
+    geom_histogram(binwidth = 0.02) +
     labs(
       title = "Distribution of Proportion of Freshmen in 5000 Samples",
       x = "Percentage Freshmen out of 25 Students",
@@ -521,16 +526,17 @@ plot_dist
 
 # Here I first create a list of four different sizes (25,50,100,500), which I
 # assign to the name "sizes". I then use sizes <- set_names(sizes, names =
-# sizes) to make sizes a “named” list, which will help R cycle through my code.
+# sizes) to make sizes a “named” list, as instructed, which will help R cycle
+# through my code.
 
 sizes <- c(25, 50, 100, 500)
 sizes <- set_names(sizes, nm = sizes)
 
 # Here I first reset the seed to 02139, as in question #4. I then use map_df()
 # and rep_sample_n() to sample from the university tibble from previous
-# questions, using size s an input. My output is a tibble with 3,375,000 rows
+# questions, using size as an input. My output is a tibble with 3,375,000 rows
 # and four columns: one for the draw number (1:5000), one for the size
-# (25,50,100, or 500), one for the student’s ID, and one for their grade.
+# (25, 50, 100, or 500), one for the student’s ID, and one for their grade.
 # Notably, I've created a new column called "size" to keep track of the sample
 # sizes.
 
@@ -580,9 +586,10 @@ samples_freshmen_plot
 
 ```{r 6, echo=FALSE}
 
-# As instructed in the problem set, here I include a call 
+# As instructed in the problem set, here I include a call to the png file I
+# created in file ps_5_rpub.Rmd
 
-knitr::include_graphics("dist_by_sample_size.png", )
+knitr::include_graphics("graphics/dist_by_sample_size.png")
 ```
 
 https://rpubs.com/Becca63/pset_5_rpub

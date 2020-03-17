@@ -32,9 +32,9 @@ sizes <- set_names(sizes, nm = sizes)
 
 # Here I first reset the seed to 02139, as in question #4. I then use map_df()
 # and rep_sample_n() to sample from the university tibble from previous
-# questions, using size s an input. My output is a tibble with 3,375,000 rows
+# questions, using size as an input. My output is a tibble with 3,375,000 rows
 # and four columns: one for the draw number (1:5000), one for the size
-# (25,50,100, or 500), one for the student’s ID, and one for their grade.
+# (25, 50, 100, or 500), one for the student’s ID, and one for their grade.
 # Notably, I've created a new column called "size" to keep track of the sample
 # sizes.
 
