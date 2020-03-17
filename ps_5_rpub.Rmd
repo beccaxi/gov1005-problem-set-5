@@ -77,8 +77,8 @@ samples_freshmen_plot <- samples_freshmen %>%
     theme_classic()
 samples_freshmen_plot
 
-# Here I save the output of this code chunk in a png file within a folder,
-# graphics, that I've manually created. The line of code is now commented out
+# Here I save the output of this code chunk in a png file within a folder named
+# graphics that I've manually created. The line of code is now commented out
 # since I've already completed the task.
 
 # ggsave("graphics/dist_by_sample_size.png")
