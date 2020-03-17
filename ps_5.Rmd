@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(haven)
 library(gt)
+library(scales)
 library(tidyverse)
 
 # Import data from Voter Study Group, survey wave beginning on 12/26/2019
@@ -81,14 +82,16 @@ the decimal point.
 ```{r ML3, echo=FALSE}
 
 # Per the codebook, a value of 3 under household_gun_owner indicates that nobody
-# in the household owns a gun. I also want to disregard respondents who weren't
-# asked (888), weren't sure (999), or skipped the question (.). After filtering
-# for those respondents, I take the mean.
+# in the household owns a gun. I also include those respondents with values of
+# 999, since respondents who "aren't sure" whether anyone in the household owns
+# a gun are assumed to not own guns (anywhere in the household). I want to
+# disregard respondents who weren't asked (888), weren't sure (999), or skipped
+# the question (.). After filtering for those respondents, I take the mean.
 
 r3_1 <- survey %>% 
   select(household_gun_owner, statements_gun_rights) %>% 
   filter(
-    household_gun_owner == 3,
+    household_gun_owner == 3 | household_gun_owner == 999,
     statements_gun_rights != 888,
     statements_gun_rights != 999,
     statements_gun_rights != "."
@@ -424,16 +427,36 @@ university <- tibble(student_id = 1:6120,
 )
 
 # Here I create a simple bar chart displaying my university's population,
-# showing the proportion of each grade in the population
+# showing the proportion of each grade in the population. I found very helpful
+# guidance in changing the y-axis labels to percentage counts and adding
+# percentage labels on top of the bars via geom_text() on stackoverflow
+# (https://stackoverflow.com/questions/40249943/adding-percentage-labels-to-a-
+# bar-chart-in-ggplot2). Finally, I use theme_classic() to mimic the example
+# plot provided in the problem set instructions.
 
-university_bar <- university %>% 
-  ggplot(aes(x = grade)) +
-    geom_bar() +
-    labs(title = "University Composition by Grade",
-       subtitle = "Entire Study Population",
-       x = "grade",
-       y = "pct")
-
+university_plot <- university %>% 
+  ggplot(aes(
+    x = grade, 
+    y = prop.table(stat(count)), 
+    label = scales::percent(prop.table(stat(count)))
+    )
+  ) +
+    geom_bar(position = "dodge") +
+    geom_text(
+      stat = "count",
+      position = position_dodge(.9),
+      vjust = -0.5,
+      size = 3
+    ) +
+    labs(
+      title = "University Composition by Grade",
+      subtitle = "Entire Study Population",
+      x = "grade",
+      y = "pct"
+    ) +
+    scale_y_continuous(labels = scales::percent) +
+    theme_classic()
+university_plot
 ```
 
 
@@ -443,7 +466,9 @@ university_bar <- university %>%
 
 
 
+
 ## Question #5: Sampling and Sample Size
+
 
 
 
