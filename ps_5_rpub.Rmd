@@ -1,20 +1,86 @@
----
-title: 'Question #6: Publish your Plot'
-author: "Rebecca Xi"
-date: "3/17/2020"
-output: html_document
----
 
-```{r 6, include=FALSE}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 
-# 
+library(infer)
+library(tidyverse)
+```
 
-knitr::include_graphics("dist_by_sample_size.png", )
+```{r 6, echo=FALSE}
 
+# Here I create my own study population, an “university” of 1800 freshmen, 1450
+# sophomores, 1570 juniors, and 1300 seniors. I use rep() to create a tibble
+# with 6120 rows, where each row represents a student and contains a student ID
+# (student_id) as well as that student's grade/year (grade).
 
+university <- tibble(
+  student_id = 1:6120,
+  grade = c(
+    rep("freshman", 1800), 
+    rep("sophomore", 1450),
+    rep("junior", 1570), 
+    rep("senior", 1300)
+  )
+)
 
-# Here I save the output of this code chunk in preparation for Question #6
+# Here I first create a list of four different sizes (25,50,100,500), which I
+# assign to the name "sizes". I then use sizes <- set_names(sizes, names =
+# sizes) to make sizes a “named” list, which will help R cycle through my code.
 
-ggsave("graphics/dist_by_sample_size.png")
+sizes <- c(25, 50, 100, 500)
+sizes <- set_names(sizes, nm = sizes)
+
+# Here I first reset the seed to 02139, as in question #4. I then use map_df()
+# and rep_sample_n() to sample from the university tibble from previous
+# questions, using size s an input. My output is a tibble with 3,375,000 rows
+# and four columns: one for the draw number (1:5000), one for the size
+# (25,50,100, or 500), one for the student’s ID, and one for their grade.
+# Notably, I've created a new column called "size" to keep track of the sample
+# sizes.
+
+set.seed(02139)
+samples <- map_df(
+  sizes, 
+  ~ rep_sample_n(university, size = ., reps = 5000), .id = "size"
+)
+
+# Here I use summarize() to count the number of freshmen in each sample and then
+# take the proportion. This tibble has 20,000 rows, one for each draw. I end up
+# creating two new columns: a "total" column that essentially duplicates "size",
+# and a "prop_freshmen" column for the proportion of students that are freshmen
+# in each sample.
+
+samples_freshmen <- samples %>% 
+  group_by(replicate, size) %>% 
+  summarize(
+    freshmen_sum = sum(grade == "freshman"), 
+    total = n()
+  ) %>% 
+  mutate(prop_freshmen = freshmen_sum / total)
+
+# I now use geom_density to plot the distribution of the proportion of freshmen
+# by sample size. Size determines the fill color, so the breaks for fill color
+# are based on size. I apply appropriate labels and also call theme_classic() to
+# mimic the given example in the problem set instructions.
+
+samples_freshmen_plot <- samples_freshmen %>% 
+  ggplot(aes(x = prop_freshmen, fill = size)) +
+    geom_density(alpha = 0.25) +
+    labs(
+      title = "Distribution of Percentage Freshman",
+      subtitle = "Average sampled percentage gets closer to true percentage as sample size increases",
+      fill = "size",
+      x = "Proportion of freshmen",
+      y = "Count"
+    ) +
+    scale_fill_discrete(breaks = sizes) +
+    theme_classic()
+samples_freshmen_plot
+
+# Here I save the output of this code chunk in a png file within a folder,
+# graphics, that I've manually created. The line of code is now commented out
+# since I've already completed the task.
+
+# ggsave("graphics/dist_by_sample_size.png")
 ```
 

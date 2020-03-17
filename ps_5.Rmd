@@ -555,17 +555,16 @@ samples_freshmen <- samples %>%
   mutate(prop_freshmen = freshmen_sum / total)
 
 # I now use geom_density to plot the distribution of the proportion of freshmen
-# by sample size. Size determines the fill color and . I apply appropriate
-# labels and breaks for fill color based on size. Finally, I apply
-# theme_classic() to mimic the given example in the problem set instructions.
+# by sample size. Size determines the fill color, so the breaks for fill color
+# are based on size. I apply appropriate labels and also call theme_classic() to
+# mimic the given example in the problem set instructions.
 
 samples_freshmen_plot <- samples_freshmen %>% 
   ggplot(aes(x = prop_freshmen, fill = size)) +
     geom_density(alpha = 0.25) +
     labs(
       title = "Distribution of Percentage Freshman",
-      subtitle = "Average sampled percentage gets closer to true percentage as 
-      sample size increases",
+      subtitle = "Average sampled percentage gets closer to true percentage as sample size increases",
       fill = "size",
       x = "Proportion of freshmen",
       y = "Count"
@@ -579,8 +578,14 @@ samples_freshmen_plot
 
 ## Question #6: Publish your Plot
 
+```{r 6, echo=FALSE}
 
-[Rpubs link]
+# As instructed in the problem set, here I include a call 
+
+knitr::include_graphics("dist_by_sample_size.png", )
+```
+
+https://rpubs.com/Becca63/pset_5_rpub
 
 
 
