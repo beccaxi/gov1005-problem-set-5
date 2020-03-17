@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(haven)
 library(gt)
-library(scales)
+library(infer)
 library(tidyverse)
 
 # Import data from Voter Study Group, survey wave beginning on 12/26/2019
@@ -82,16 +82,14 @@ the decimal point.
 ```{r ML3, echo=FALSE}
 
 # Per the codebook, a value of 3 under household_gun_owner indicates that nobody
-# in the household owns a gun. I also include those respondents with values of
-# 999, since respondents who "aren't sure" whether anyone in the household owns
-# a gun are assumed to not own guns (anywhere in the household). I want to
-# disregard respondents who weren't asked (888), weren't sure (999), or skipped
-# the question (.). After filtering for those respondents, I take the mean.
+# in the household owns a gun. I also want to disregard respondents who weren't
+# asked (888), weren't sure (999), or skipped the question (.). After filtering
+# for those respondents, I take the mean.
 
 r3_1 <- survey %>% 
   select(household_gun_owner, statements_gun_rights) %>% 
   filter(
-    household_gun_owner == 3 | household_gun_owner == 999,
+    household_gun_owner == 3,
     statements_gun_rights != 888,
     statements_gun_rights != 999,
     statements_gun_rights != "."
@@ -390,13 +388,18 @@ onethousand <- tibble(results = map(1:1000, ~ draw_cards(2))) %>%
 # Here I count the number of draws that are "mixed", using count() and
 # as.numeric() to aggregate and get it into integer form. I then divide it by
 # the total number of draws, which is 1000, and multiply the resulting value by
-# 100 to get a percentage value. To get rid of the warning that I've introduced
-# NA's by coercion, 
+# 100 to get a percentage value. Per Piazza help, I call ungroup() first before
+# using select(n) because otherwise the tibble would still be grouped by outcome
+# after I apply filter() and count(), and select(n) would not work. This gets
+# rid of the pesky warning I'd been getting that I've introduced NA's by
+# coercion, since now I'm able to select for only the integer value that I want.
 
 mixed <- onethousand %>% 
   group_by(outcome) %>%
   filter(outcome == "mixed") %>% 
   count() %>% 
+  ungroup() %>% 
+  select(n) %>% 
   as.numeric()
 mixed_percent <- 100 * mixed / 1000
 ```
@@ -417,13 +420,14 @@ card draws have "mixed" colors.
 # with 6120 rows, where each row represents a student and contains a student ID
 # (student_id) as well as that student's grade/year (grade).
 
-university <- tibble(student_id = 1:6120,
-                     grade = c(
-                       rep("freshman", 1800), 
-                       rep("sophomore", 1450),
-                       rep("junior", 1570), 
-                       rep("senior", 1300)
-                     )
+university <- tibble(
+  student_id = 1:6120,
+  grade = c(
+    rep("freshman", 1800), 
+    rep("sophomore", 1450),
+    rep("junior", 1570), 
+    rep("senior", 1300)
+  )
 )
 
 # Here I create a simple bar chart displaying my university's population,
@@ -431,8 +435,9 @@ university <- tibble(student_id = 1:6120,
 # guidance in changing the y-axis labels to percentage counts and adding
 # percentage labels on top of the bars via geom_text() on stackoverflow
 # (https://stackoverflow.com/questions/40249943/adding-percentage-labels-to-a-
-# bar-chart-in-ggplot2). Finally, I use theme_classic() to mimic the example
-# plot provided in the problem set instructions.
+# bar-chart-in-ggplot2). I also manually add labels (title, subtitle, and axis
+# labels) and use theme_classic() to mimic the example plot provided in the
+# problem set instructions.
 
 university_plot <- university %>% 
   ggplot(aes(
@@ -463,13 +468,74 @@ university_plot
 
 ## Question #4: Sampling
 
+```{r 4, echo=FALSE}
 
+# Here I create a function, draw_samples(), that draws 5000 samples of 25
+# students each from the university population. I use set.seed(02139) to
+# standardize the otherwise randomly drawn distributions to match the solutions
+# key. The result of draw_samples() is a tibble containing an indexing column, a
+# column "freshmen_sum" that records the number of freshmen drawn in each
+# sample, and a column "perc_freshmen" that records the freshmen drawn in each
+# sample as a percentage of the whole sample. I also add a column sample_id
+# which assigns to each sample an integer value from 1 to 5000, consecutively.
+
+set.seed(02139)
+draw_samples <- function() {
+  university %>%
+    rep_sample_n(size = 25, reps = 5000) %>%
+    summarize(freshmen_sum = sum(grade == "freshman")) %>%
+    mutate(perc_freshmen = (sum(grade == "freshman")) / 25) %>% 
+    mutate(sample_id = 1:5000)
+}
+
+# Here, I essentially just save the tibble result of the function draw_samples()
+# in an actual tibble named freshmen_dist
+
+freshmen_dist <- draw_samples()
+
+# Finally, I create a plot of the distribution of percent freshmen using
+# geom_density, to avoid the unnecessary hassle of having to figure out an
+# appropriate binwidth. 
+
+plot_dist <- freshmen_dist %>%
+  ggplot(aes(x = sample_id)) + 
+    geom_histogram() +
+    labs(
+      title = "Percentage of Freshmen Sampled over 5000 Samples",
+      caption = "Sampling 25 university students from population of 6120",
+      x = "Samples",
+      y = "Percent Freshmen"
+    ) 
+plot_dist
+```
 
 
 
 ## Question #5: Sampling and Sample Size
 
+```{r 5, echo=FALSE}
 
+#First, create a list of four different sizes (25,50,100,500). Use sizes <-
+#set_names(sizes, names = sizes), to make sizes a “named” list, which will help
+#R cycle through your code.
+
+#Reset the seed to 02139. Use map_df to call rep_sample_n to sample from your
+#university tibble, using size as an input. Your output should be a tibble with
+#3,375,000 rows and four columns; one for the draw number (1:5000), one for the
+#size (25,50,100, or 500), the student’s ID, and their grade. If you’re stuck on
+#how to cycle through the elements of the “sizes” list, try using size =. in
+#your map_df() expression, and then telling R what the .id stands for outside
+#the parentheses. You don’t need to print this tibble
+
+#Use a summarize function to count the number of freshmen in each sample, and
+#then take the proportion. Your tibble should now have 20,000 rows; one for each
+#draw.
+
+#Using geom_density, plot the distribution of the proportion of freshmen by
+#sample size.
+
+
+```
 
 
 
