@@ -352,20 +352,89 @@ table
 
 ```{r 2E, echo=FALSE}
 
-# 
+# I begin with code identical in format to the code required in 2B), where I
+# create a tibble (here I name it "onethousand") mapping the results of 1000
+# draws of 2 cards each time. I continue with code drawn from 2C) and 2D) in
+# order to obtain the number of mixed card draws.
 
+onethousand <- tibble(results = map(1:1000, ~ draw_cards(2))) %>% 
+  mutate(
+    red1 = map_lgl(
+      results, 
+      ~ ifelse(
+        .[[1]] == "hearts" |
+        .[[1]] == "diamonds",
+        TRUE, 
+        FALSE)
+    ),
+    red2 = map_lgl(
+      results, 
+      ~ ifelse(
+        .[[2]] == "hearts" |
+        .[[2]] == "diamonds",
+        TRUE, 
+        FALSE)
+    )
+  ) %>% 
+  mutate(outcome = case_when(
+    red1 == TRUE & red2 == TRUE ~ "Both red",
+    red1 == FALSE & red2 == FALSE ~ "Both black",
+    red1 == TRUE & red2 == FALSE ~ "mixed",
+    red1 == FALSE & red2 == TRUE ~ "mixed"
+    )
+  )
 
+# Here I count the number of draws that are "mixed", using count() and
+# as.numeric() to aggregate and get it into integer form. I then divide it by
+# the total number of draws, which is 1000, and multiply the resulting value by
+# 100 to get a percentage value. To get rid of the warning that I've introduced
+# NA's by coercion, 
+
+mixed <- onethousand %>% 
+  group_by(outcome) %>%
+  filter(outcome == "mixed") %>% 
+  count() %>% 
+  as.numeric()
+mixed_percent <- 100 * mixed / 1000
 ```
 
 #### 2E)
 
-When I simulate drawing two cards 1000 times, __ percent of my cards have 
-"mixed" colors.
+When I simulate drawing two cards 1000 times, `r mixed_percent` percent of my 
+card draws have "mixed" colors.
 
 
 
 ## Question #3: Modeling a Study Population
 
+```{r 3, echo=FALSE}
+
+# Here I create my own study population, an “university” of 1800 freshmen, 1450
+# sophomores, 1570 juniors, and 1300 seniors. I use rep() to create a tibble
+# with 6120 rows, where each row represents a student and contains a student ID
+# (student_id) as well as that student's grade/year (grade).
+
+university <- tibble(student_id = 1:6120,
+                     grade = c(
+                       rep("freshman", 1800), 
+                       rep("sophomore", 1450),
+                       rep("junior", 1570), 
+                       rep("senior", 1300)
+                     )
+)
+
+# Here I create a simple bar chart displaying my university's population,
+# showing the proportion of each grade in the population
+
+university_bar <- university %>% 
+  ggplot(aes(x = grade)) +
+    geom_bar() +
+    labs(title = "University Composition by Grade",
+       subtitle = "Entire Study Population",
+       x = "grade",
+       y = "pct")
+
+```
 
 
 
