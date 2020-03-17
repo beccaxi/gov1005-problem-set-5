@@ -1,0 +1,20 @@
+---
+title: 'Question #6: Publish your Plot'
+author: "Rebecca Xi"
+date: "3/17/2020"
+output: html_document
+---
+
+```{r 6, include=FALSE}
+
+# 
+
+knitr::include_graphics("dist_by_sample_size.png", )
+
+
+
+# Here I save the output of this code chunk in preparation for Question #6
+
+ggsave("graphics/dist_by_sample_size.png")
+```
+
